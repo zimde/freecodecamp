@@ -1,49 +1,198 @@
-#!/bin/bash
+--
+-- PostgreSQL database dump
+--
 
-PSQL="psql --username=freecodecamp --dbname=number_guess -t --no-align -c"
+-- Dumped from database version 12.9 (Ubuntu 12.9-2.pgdg20.04+1)
+-- Dumped by pg_dump version 12.9 (Ubuntu 12.9-2.pgdg20.04+1)
 
-NUM_TO_GUESS=$((RANDOM % 10))
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
 
-MAIN() {
-  echo "Enter your username:"
-  read USERNAME
-  if [[ -z $USERNAME || ${#USERNAME} -gt 22 ]]
-  then 
-    MAIN
-  else
-    USER_ID=$($PSQL "SELECT user_id FROM users WHERE username='$USERNAME'")
-    if [[ -z $USER_ID ]]
-    then 
-      echo "Welcome, $USERNAME! It looks like this is your first time here."
-      INSERT_USER=$($PSQL "INSERT INTO users(username) VALUES ('$USERNAME')")
-      USER_ID=$($PSQL "SELECT user_id FROM users WHERE username='$USERNAME'")
-    else
-      USER_INFO=$($PSQL "SELECT COUNT(*),MIN(guesses) FROM games WHERE user_id=$USER_ID")
-      IFS="|"
-      read GAMES_PLAYED MIN_GUESSES <<< $USER_INFO
-      echo "Welcome back, $USERNAME! You have played $GAMES_PLAYED games, and your best game took $MIN_GUESSES guesses."
-    fi
-    IFS=" "
-    echo "Guess the secret number between 1 and 1000:"
-    read GUESS
-    GUESS_COUNT=1
-    while [[ $GUESS != $NUM_TO_GUESS ]]
-    do
-      if [[ ! $GUESS =~ ^[0-9]+$ ]]
-      then
-        echo "That is not an integer, guess again:"
-      elif [[ $GUESS -gt $NUM_TO_GUESS ]]
-      then
-        echo "It's lower than that, guess again:"
-      else
-        echo "It's higher than that, guess again:"
-      fi
-      read GUESS
-      (( GUESS_COUNT++ ))
-    done
-    echo "You guessed it in $GUESS_COUNT tries. The secret number was $NUM_TO_GUESS. Nice job!"
-    INSERT_GAME=$($PSQL "INSERT INTO games(user_id,guesses) VALUES ($USER_ID,$GUESS_COUNT)")
-  fi
-}
+DROP DATABASE number_guess;
+--
+-- Name: number_guess; Type: DATABASE; Schema: -; Owner: freecodecamp
+--
 
-MAIN
+CREATE DATABASE number_guess WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'C.UTF-8' LC_CTYPE = 'C.UTF-8';
+
+
+ALTER DATABASE number_guess OWNER TO freecodecamp;
+
+\connect number_guess
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: games; Type: TABLE; Schema: public; Owner: freecodecamp
+--
+
+CREATE TABLE public.games (
+    game_id integer NOT NULL,
+    user_id integer NOT NULL,
+    guesses integer NOT NULL
+);
+
+
+ALTER TABLE public.games OWNER TO freecodecamp;
+
+--
+-- Name: games_game_id_seq; Type: SEQUENCE; Schema: public; Owner: freecodecamp
+--
+
+CREATE SEQUENCE public.games_game_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.games_game_id_seq OWNER TO freecodecamp;
+
+--
+-- Name: games_game_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: freecodecamp
+--
+
+ALTER SEQUENCE public.games_game_id_seq OWNED BY public.games.game_id;
+
+
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: freecodecamp
+--
+
+CREATE TABLE public.users (
+    user_id integer NOT NULL,
+    username character varying(22) NOT NULL
+);
+
+
+ALTER TABLE public.users OWNER TO freecodecamp;
+
+--
+-- Name: users_user_id_seq; Type: SEQUENCE; Schema: public; Owner: freecodecamp
+--
+
+CREATE SEQUENCE public.users_user_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.users_user_id_seq OWNER TO freecodecamp;
+
+--
+-- Name: users_user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: freecodecamp
+--
+
+ALTER SEQUENCE public.users_user_id_seq OWNED BY public.users.user_id;
+
+
+--
+-- Name: games game_id; Type: DEFAULT; Schema: public; Owner: freecodecamp
+--
+
+ALTER TABLE ONLY public.games ALTER COLUMN game_id SET DEFAULT nextval('public.games_game_id_seq'::regclass);
+
+
+--
+-- Name: users user_id; Type: DEFAULT; Schema: public; Owner: freecodecamp
+--
+
+ALTER TABLE ONLY public.users ALTER COLUMN user_id SET DEFAULT nextval('public.users_user_id_seq'::regclass);
+
+
+--
+-- Data for Name: games; Type: TABLE DATA; Schema: public; Owner: freecodecamp
+--
+
+INSERT INTO public.games VALUES (332, 197, 6);
+INSERT INTO public.games VALUES (333, 197, 10);
+INSERT INTO public.games VALUES (334, 198, 8);
+INSERT INTO public.games VALUES (335, 197, 9);
+INSERT INTO public.games VALUES (336, 197, 7);
+INSERT INTO public.games VALUES (337, 197, 8);
+
+
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: freecodecamp
+--
+
+INSERT INTO public.users VALUES (197, 'user_1688718127933');
+INSERT INTO public.users VALUES (198, 'user_1688718127932');
+
+
+--
+-- Name: games_game_id_seq; Type: SEQUENCE SET; Schema: public; Owner: freecodecamp
+--
+
+SELECT pg_catalog.setval('public.games_game_id_seq', 337, true);
+
+
+--
+-- Name: users_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: freecodecamp
+--
+
+SELECT pg_catalog.setval('public.users_user_id_seq', 198, true);
+
+
+--
+-- Name: games games_pkey; Type: CONSTRAINT; Schema: public; Owner: freecodecamp
+--
+
+ALTER TABLE ONLY public.games
+    ADD CONSTRAINT games_pkey PRIMARY KEY (game_id);
+
+
+--
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: freecodecamp
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (user_id);
+
+
+--
+-- Name: users users_username_key; Type: CONSTRAINT; Schema: public; Owner: freecodecamp
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_username_key UNIQUE (username);
+
+
+--
+-- Name: games games_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: freecodecamp
+--
+
+ALTER TABLE ONLY public.games
+    ADD CONSTRAINT games_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id);
+
+
+--
+-- PostgreSQL database dump complete
+--
+
